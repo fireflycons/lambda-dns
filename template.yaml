@@ -1,0 +1,33 @@
+Description: "Exports DnsQuery: The ARN to a lambda function for use with custom resources. Looks up IPV4 address for hostname in DNS."
+
+Resources:
+  # Basic lambda execution role
+  Role:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action: 
+          - "sts:AssumeRole"
+
+  # Create the lambda function from the code stored in the bucket specified in params 
+  Function:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: DnsQuery.zip
+      Handler: DnsQuery.handler
+      Role: !GetAtt Role.Arn
+      Runtime: nodejs6.10
+
+Outputs:
+  FunctionArn:
+    Value: !GetAtt Function.Arn
+    Export:
+      Name: DnsQuery
